@@ -3,10 +3,16 @@
 ##library(mgcv)
 #library(lmtest)
 
-dist.custom <- .dist.custom
-dist.custom.veravar <- .dist.custom.veravar
-dist.custom.param <- .dist.custom.param
-wd=.wd
+#dist.custom <- .dist.custom
+#dist.custom.veravar <- .dist.custom.veravar
+#dist.custom.param <- .dist.custom.param
+#wd=.wd
+
+dist.custom <- getShinyOption("dist.custom",NULL)
+dist.custom.veravar <- getShinyOption("dist.custom.veravar",NULL)
+dist.custom.param <- getShinyOption("dist.custom.param",NULL)
+wd <- getShinyOption("wd",NULL)
+
 
 #dist.custom.param=param
 #dist.custom=dist

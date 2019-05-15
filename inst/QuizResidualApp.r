@@ -4,19 +4,20 @@
 #library(lmtest)
 #
 #
-##ComputerDecision <- getShinyOption("ComputerDecision",NULL)
-##Simulation <- getShinyOption("Simulation",NULL)
-##dir.suoniluci <- getShinyOption("dir.suoniluci",NULL)
+ComputerDecision <- getShinyOption("ComputerDecision",NULL)
+Simulation <- getShinyOption("Simulation",NULL)
+dir.sounds <- getShinyOption("dir.sounds",NULL)
+dir.images <- getShinyOption("dir.images",NULL)
 #
 #source("lmviz/R/ComputerDecision.default.r")
 #source("lmviz/R/Simulation.default.r")
 #Simulation=Simulation.default
 #ComputerDecision=ComputerDecision.default
 
-Simulation <- .Simulation
-ComputerDecision <- .ComputerDecision
-dir.sounds <- .dir.sounds
-dir.images <- .dir.images
+#Simulation <- .Simulation
+#ComputerDecision <- .ComputerDecision
+#dir.sounds <- .dir.sounds
+#dir.images <- .dir.images
 
 ui <- fluidPage(id="all",
                 shinyjs::useShinyjs(),

@@ -35,6 +35,7 @@
 #' ## End(Not run)
 #'
 #' @import shiny
+# #' @import shinyjs ###########################################VERIFICARE!!!
 #'
 #' @export
 
@@ -54,19 +55,19 @@ QuizResidual=function(ComputerDecision=ComputerDecision.default,Simulation=Simul
   ## Solution 1 to pass arguments to the shiny app
   ##  first two lines in QuizResidualApp.r superfluous (no harm done if left there)
   ##  Source: https://github.com/rstudio/shiny/issues/440
-    .GlobalEnv$".ComputerDecision" <- ComputerDecision
-    .GlobalEnv$".Simulation"  <- Simulation
-    .GlobalEnv$".dir.sounds" <- dir.sounds
-    .GlobalEnv$".dir.images"  <- dir.images
+  #  .GlobalEnv$".ComputerDecision" <- ComputerDecision
+  #  .GlobalEnv$".Simulation"  <- Simulation
+  #  .GlobalEnv$".dir.sounds" <- dir.sounds
+  #  .GlobalEnv$".dir.images"  <- dir.images
 
   ###############################################################
   ## Solution 2 to pass arguments to the shiny app
   ##  goes WITH the first two lines in QuizResidualApp.r (needed)
   ##  Source: https://stackoverflow.com/questions/49470474/saving-r-shiny-app-as-a-function-with-arguments-passed-to-the-shiny-app
-  #shinyOptions(ComputerDecision = ComputerDecision)
-  #shinyOptions(Simulation = Simulation)
-    #  shinyOptions(dir.sounds = dir.sounds)
-    #  shinyOptions(dir.images = dir.images)
+  shinyOptions(ComputerDecision = ComputerDecision)
+  shinyOptions(Simulation = Simulation)
+  shinyOptions(dir.sounds = dir.sounds)
+  shinyOptions(dir.images = dir.images)
     appDir <- system.file("QuizResidualApp.r", package = "lmviz")
     shiny::runApp(appDir)
 }

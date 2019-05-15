@@ -17,7 +17,7 @@ ui <- fluidPage(
       splitLayout(
         numericInput("beta0","beta_1",0,-10,10,0.1,width="100%"),
         numericInput("beta1","beta_2",1,-10,10,0.1,width="100%"),
-        numericInput("sdeverr","dev. st. errore",1,0,10,0.1,width="100%")
+        numericInput("sdeverr","error st. dev.",1,0,10,0.1,width="100%")
       ),
       hr(),
       p(strong("Explanatory variable")),
@@ -425,12 +425,12 @@ server <- function(input, output, session) {
   output$residui1=renderPlot({
     par(mar=c(5,4,1,1))
     plot(x(),fit()$resid,pch=20,las=1,
-         xlab="x",ylab="residui")
+         xlab="x",ylab="residuals")
     abline(h=0)
   })
   output$residui2=renderPlot({
     par(mar=c(5,3,1,1))
-    hist(fit()$resid,border="white",col=gray(0.6),main="",xlab="residui")
+    hist(fit()$resid,border="white",col=gray(0.6),main="",xlab="residuals")
   })
   output$residui3=renderPlot({
     par(mar=c(5,3,1,1))

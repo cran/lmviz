@@ -114,19 +114,19 @@ BadLM=function(dist.custom=NULL,dist.custom.veravar=NULL,dist.custom.param=NULL)
   ## Solution 1 to pass arguments to the shiny app
   ##  first two lines in QuizResidualApp.r superfluous (no harm done if left there)
   ##  Source: https://github.com/rstudio/shiny/issues/440
-    .GlobalEnv$.dist.custom <- dist.custom
-    .GlobalEnv$.dist.custom.veravar <- dist.custom.veravar
-    .GlobalEnv$.dist.custom.param <- dist.custom.param
-    .GlobalEnv$.wd=getwd()
+   # .GlobalEnv$.dist.custom <- dist.custom
+  #  .GlobalEnv$.dist.custom.veravar <- dist.custom.veravar
+  #  .GlobalEnv$.dist.custom.param <- dist.custom.param
+  #  .GlobalEnv$.wd=getwd()
 
   ###############################################################
   ## Solution 2 to pass arguments to the shiny app
   ##  goes WITH the first two lines in QuizResidualApp.r (needed)
   ##  Source: https://stackoverflow.com/questions/49470474/saving-r-shiny-app-as-a-function-with-arguments-passed-to-the-shiny-app
-  #shinyOptions(dist.custom = dist.custom)
-  #shinyOptions(dist.custom.veravar = dist.custom.veravar)
-    #  shinyOptions(dist.custom.param = dist.custom.param)
-    #  shinyOptions(wd=getwd())
+  shinyOptions(dist.custom = dist.custom)
+  shinyOptions(dist.custom.veravar = dist.custom.veravar)
+  shinyOptions(dist.custom.param = dist.custom.param)
+  shinyOptions(wd=getwd())
     appDir <- system.file("BadLMApp.r", package = "lmviz")
     shiny::runApp(appDir)
 }
