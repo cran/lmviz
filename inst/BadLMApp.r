@@ -23,173 +23,173 @@ ui <- fluidPage(
   withMathJax(),
   tags$h1(id="titolo","Consequences of hypotheses violation"),
   tabsetPanel(id="main",
-        tabPanel("?Model specification",
-                 verticalLayout(
-                   splitLayout(
-                     wellPanel(
-                       HTML("<p style='white-space: pre-wrap'>The panel allows to specify a distribution for the explanatory variable x and the regression parameters beta1 and beta2.</p>
-                            <p style='white-space: pre-wrap'>The explanatory variable x is simulated once (is renewed anytime the parameters of its distribution are changes or by pressing the appropriate button (see below).</p>
-                            <p style='white-space: pre-wrap'>The explanatory variable x is standardized between 0 and the maximum value set here, this allows to assess the properties of extrapolation since the the prediction of Y|x=1 is simulated.</p>
-                            "),style = "height:400px;"
-                     ),
-                     wellPanel(
-                       HTML("<p style='white-space: pre-wrap'>The panel allows to set thesample size and the distribution of Y.</p>
-                            <p style='white-space: pre-wrap'>Select the distribution from the drop-down menu, the parameters will update accordingly and the right panel will change as weel, possibly allowing input of the variance function.</p>
-                            <p style='white-space: pre-wrap'>Note that Y is always simulated so that E(Y)=beta1+beta2*x (this is to have a true value of beta1 and beta2 to compare the sample distributions to.</p>
-                            "),style = "height:400px;"
-                     ),
-                     wellPanel(
-                       HTML("<p style='white-space: pre-wrap'>Depending on the distribution of Y which is selected the panel will show</p>
-                             <p style='white-space: pre-wrap'> - a plot to draw the variance function g(x)=V(Y|X=x) or its square root: g(x) will be the linear interpolation of the points clicked on the plot (double click ona point to cancel it, click on the gray areas on top and bottom to change the range of ordinate axis, click on the gray areas on left and right to move the first and last points;</p>
-<p style='white-space: pre-wrap'> - a plot showing the true variance function if this is set in analytic form;</p>
-<p style='white-space: pre-wrap'> - the distribution of Y|X=0 and that of Y|X=1;</p>
-                            "),style = "height:400px;"
-                     )
-                   ),
-                   wellPanel(HTML("<p style='white-space: pre-wrap'>Simulated values based on the specified data generating mechanism, model fit and residuals. (Buttons to renew values of Y and possibly x are available.)</p>"
+              tabPanel("?Model specification",
+                       verticalLayout(
+                         splitLayout(
+                           wellPanel(
+                             HTML("<p style='white-space: pre-wrap'>The panel allows to specify a distribution for the explanatory variable x and the regression parameters beta1 and beta2.</p>
+                                  <p style='white-space: pre-wrap'>The explanatory variable x is simulated once (is renewed anytime the parameters of its distribution are changes or by pressing the appropriate button (see below).</p>
+                                  <p style='white-space: pre-wrap'>The explanatory variable x is standardized between 0 and the maximum value set here, this allows to assess the properties of extrapolation since the the prediction of Y|x=1 is simulated.</p>
+                                  "),style = "height:400px;"
+                                  ),
+                           wellPanel(
+                             HTML("<p style='white-space: pre-wrap'>The panel allows to set thesample size and the distribution of Y.</p>
+                                  <p style='white-space: pre-wrap'>Select the distribution from the drop-down menu, the parameters will update accordingly and the right panel will change as weel, possibly allowing input of the variance function.</p>
+                                  <p style='white-space: pre-wrap'>Note that Y is always simulated so that E(Y)=beta1+beta2*x (this is to have a true value of beta1 and beta2 to compare the sample distributions to.</p>
+                                  "),style = "height:400px;"
+                                  ),
+                           wellPanel(
+                             HTML("<p style='white-space: pre-wrap'>Depending on the distribution of Y which is selected the panel will show</p>
+                                  <p style='white-space: pre-wrap'> - a plot to draw the variance function g(x)=V(Y|X=x) or its square root: g(x) will be the linear interpolation of the points clicked on the plot (double click on a point to cancel it, click on the gray areas on top and bottom to change the range of ordinate axis, click on the gray areas on left and right to move the first and last points;</p>
+                                  <p style='white-space: pre-wrap'> - a plot showing the true variance function if this is set in analytic form;</p>
+                                  <p style='white-space: pre-wrap'> - the distribution of Y|X=0 and that of Y|X=1;</p>
+                                  "),style = "height:400px;"
+                                  )
+                                  ),
+                         wellPanel(HTML("<p style='white-space: pre-wrap'>Simulated values based on the specified data generating mechanism, model fit and residuals. (Buttons to renew values of Y and possibly x are available.)</p>"
+                         ))
+                                  )
+                                  ),
+              tabPanel("Model specification",
+                       verticalLayout(
+                         splitLayout(cellArgs=list(style = "overflow:hidden;"),
+                                     wellPanel(
+                                       verticalLayout(
+                                         selectInput("distribuzioneX","Distribution of x",
+                                                     choices = c("Regular grid"="regulargrid","Uniform"="uniform","Gaussian"="conc","Asymmetric"="asymm")),
+                                         sliderInput("parx","-",min=0.1,max=1,value=1,step=0.1),
+                                         sliderInput("taglia","upper limit for x",min=0.1,max=1,value=1,step=0.1),
+                                         h4("Regression parameters (E(Y)=beta1+beta2*x)",style='white-space: pre-wrap'),
+                                         splitLayout(
+                                           uiOutput("beta1inser"),
+                                           uiOutput("beta2inser")
+                                         )
+                                       ),style = "height:500px;"),
+                                     wellPanel(
+                                       verticalLayout(
+                                         sliderInput("n","Number of observations",min=8,max=1000,value=25,step=1),
+                                         selectInput("distribuzione","Distribution of Y",
+                                                     choices = c("Gaussian V(Y)=g(x)"="dist.normale","AR1"="dist.normaleAR1",
+                                                                 "Poisson"="dist.poisson","Binomial"="dist.binomiale","Gamma"="dist.gamma",
+                                                                 "Gamma transl."="dist.gammatrasl","Uniform [-c,c]"="dist.uniforme",
+                                                                 "Student-t (error=g(x)*t_df)"="dist.student")),
+                                         sliderInput("par","parametro",min=1,max=30,value=10,step=1),
+                                         sliderInput("par2","parametro2",min=1,max=30,value=10,step=1)),
+                                       p("Note that E(Y)=beta1+beta2*x for all models",style='white-space: pre-wrap'),
+                                       style = "height:500px;"),
+                                     wellPanel(
+                                       conditionalPanel(condition="output.servePannelloVarianza",
+                                                        checkboxInput("inputvarosd","set g(x) (set square root of g(x))"),
+                                                        plotOutput("plotinputvarianza",
+                                                                   click = "plot_click",dblclick = "plot_dblclick")),
+                                       conditionalPanel(condition="!output.servePannelloVarianza",
+                                                        plotOutput("plotdist")),style = "height:500px;")
+                         ),
+                         wellPanel(
+                           fluidRow(cellArgs=list(style = "overflow:hidden;"),
+                                    column(width=1,
+                                           verticalLayout(
+                                             actionButton("rinnova",label="New Y"),
+                                             actionButton("rinnovaX",label="New x,Y")
+                                           )),
+                                    column(width=11,
+                                           splitLayout(cellArgs=list(style = "overflow:hidden;"),
+                                                       plotOutput("plotdiprova",height=300),
+                                                       plotOutput("plotdiprova2",height=300),
+                                                       plotOutput("plotdiprova3",height=300)
+                                           )))
+                         ))
+              ),
+              tabPanel("Simulation",
+                       fluidRow(
+                         column(width=2,
+                                wellPanel(
+                                  verticalLayout(
+                                    checkboxInput("showqqplot","Normal quantile plots"),
+                                    selectInput("m","N. sim.",choices=c(500,1000,5000,10000)),
+                                    actionButton("vai","Go"),
+                                    selectInput("parametro",label="Parameter",choices=c("beta1","beta2","prev","sigma2")),
+                                    plotOutput("shapiroplot",height=200),
+                                    plotOutput("bptestplot",height=200)
+                                  )
+                                )),
+                         column(width=10,
+                                verticalLayout(
+                                  conditionalPanel(condition="input.parametro=='beta2'",
+                                                   splitLayout(cellArgs=list(style = "overflow:hidden;"),
+                                                               plotOutput("beta2plot"),
+                                                               plotOutput("beta2tstat"),
+                                                               plotOutput("coperturaintervallibeta2")
+                                                   )),
+                                  conditionalPanel(condition="input.parametro=='beta1'",
+                                                   splitLayout(cellArgs=list(style = "overflow:hidden;"),
+                                                               plotOutput("beta1plot"),
+                                                               plotOutput("beta1tstat"),
+                                                               plotOutput("coperturaintervallibeta1")
+                                                   )),
+                                  conditionalPanel(condition="input.parametro=='prev'",
+                                                   splitLayout(cellArgs=list(style = "overflow:hidden;"),
+                                                               plotOutput("prevplot"),
+                                                               plotOutput("prevtstat"),
+                                                               plotOutput("coperturaintervalliprev")
+                                                   )),
+                                  conditionalPanel(condition="input.parametro=='sigma2'",
+                                                   splitLayout(cellArgs=list(style = "overflow:hidden;"),
+                                                               plotOutput("sigmaplot"),
+                                                               plotOutput("sigma2plot"),
+                                                               plotOutput("coperturaintervallisigma2")
+                                                   )),
+                                  wellPanel(tableOutput("tabellasim")),
+                                  actionButton("save","Save results (to object named results.badLM in working space)")
+                                )
+                         ))
+              ),
+              tabPanel("?Simulations",
+                       fluidRow(
+                         column(width=3,
+                                wellPanel(verticalLayout(
+                                  HTML("<p style='white-space: pre-wrap'>Set the number of simulations.</p>
+                                       <p style='white-space: pre-wrap'>Pres the Go button to perform the desired number of simulations (may take some time).</p>
+                                       <p style='white-space: pre-wrap'>When simulations have been performed the drop-down menu allows to choose the parameter to show on the right.</p>
+                                       <p style='white-space: pre-wrap'>Plot of p-values of Breusch-Pagan and Shapiro wilks tests are also shown.</p>
+                                       ")
                                   ))
-                 )
-                 ),
-        tabPanel("Model specification",
-                 verticalLayout(
-                   splitLayout(cellArgs=list(style = "overflow:hidden;"),
-                               wellPanel(
-                                 verticalLayout(
-                                   selectInput("distribuzioneX","Distribution of x",
-                                               choices = c("Regular grid"="regulargrid","Uniform"="uniform","Gaussian"="conc","Asymmetric"="asymm")),
-                                   sliderInput("parx","-",min=0.1,max=1,value=1,step=0.1),
-                                   sliderInput("taglia","upper limit for x",min=0.1,max=1,value=1,step=0.1),
-                                   h4("Regression parameters (E(Y)=beta1+beta2*x)",style='white-space: pre-wrap'),
-                                   splitLayout(
-                                     uiOutput("beta1inser"),
-                                     uiOutput("beta2inser")
-                                 )
-                               ),style = "height:500px;"),
-                               wellPanel(
-                               verticalLayout(
-                                 sliderInput("n","Number of observations",min=8,max=1000,value=25,step=1),
-                                 selectInput("distribuzione","Distribution of Y",
-                                             choices = c("Gaussian V(Y)=g(x)"="dist.normale","AR1"="dist.normaleAR1",
-                                                         "Poisson"="dist.poisson","Binomial"="dist.binomiale","Gamma"="dist.gamma",
-                                                         "Gamma transl."="dist.gammatrasl","Uniform [-c,c]"="dist.uniforme",
-                                                         "Student-t (error=g(x)*t_df)"="dist.student")),
-                                  sliderInput("par","parametro",min=1,max=30,value=10,step=1),
-                                 sliderInput("par2","parametro2",min=1,max=30,value=10,step=1)),
-                               p("Note that E(Y)=beta1+beta2*x for all models",style='white-space: pre-wrap'),
-                               style = "height:500px;"),
-                               wellPanel(
-                                 conditionalPanel(condition="output.servePannelloVarianza",
-                                                  checkboxInput("inputvarosd","set g(x) (set square root of g(x))"),
-                                                  plotOutput("plotinputvarianza",
-                                                             click = "plot_click",dblclick = "plot_dblclick")),
-                                 conditionalPanel(condition="!output.servePannelloVarianza",
-                                                plotOutput("plotdist")),style = "height:500px;")
-                 ),
-                 wellPanel(
-                 fluidRow(cellArgs=list(style = "overflow:hidden;"),
-                          column(width=1,
-                                 verticalLayout(
-                                   actionButton("rinnova",label="New Y"),
-                                   actionButton("rinnovaX",label="New x,Y")
-                                 )),
-                          column(width=11,
-                                 splitLayout(cellArgs=list(style = "overflow:hidden;"),
-                                 plotOutput("plotdiprova",height=300),
-                             plotOutput("plotdiprova2",height=300),
-                             plotOutput("plotdiprova3",height=300)
-                               )))
-                   ))
-                 ),
-        tabPanel("Simulation",
-                 fluidRow(
-                   column(width=2,
-                          wellPanel(
-                          verticalLayout(
-                          checkboxInput("showqqplot","Normal quantile plots"),
-                          selectInput("m","N. sim.",choices=c(500,1000,5000,10000)),
-                          actionButton("vai","Vai"),
-                          selectInput("parametro",label="Parameter",choices=c("beta1","beta2","prev","sigma2")),
-                          plotOutput("shapiroplot",height=200),
-                          plotOutput("bptestplot",height=200)
-                          )
-                   )),
-                   column(width=10,
-                          verticalLayout(
-                    conditionalPanel(condition="input.parametro=='beta2'",
-                     splitLayout(cellArgs=list(style = "overflow:hidden;"),
-                       plotOutput("beta2plot"),
-                       plotOutput("beta2tstat"),
-                       plotOutput("coperturaintervallibeta2")
-                   )),
-                   conditionalPanel(condition="input.parametro=='beta1'",
-                                    splitLayout(cellArgs=list(style = "overflow:hidden;"),
-                                      plotOutput("beta1plot"),
-                                      plotOutput("beta1tstat"),
-                                      plotOutput("coperturaintervallibeta1")
-                                    )),
-                   conditionalPanel(condition="input.parametro=='prev'",
-                                    splitLayout(cellArgs=list(style = "overflow:hidden;"),
-                                      plotOutput("prevplot"),
-                                      plotOutput("prevtstat"),
-                                      plotOutput("coperturaintervalliprev")
-                                    )),
-                   conditionalPanel(condition="input.parametro=='sigma2'",
-                                    splitLayout(cellArgs=list(style = "overflow:hidden;"),
-                                      plotOutput("sigmaplot"),
-                                      plotOutput("sigma2plot"),
-                                      plotOutput("coperturaintervallisigma2")
-                                    )),
-                   wellPanel(tableOutput("tabellasim")),
-                   actionButton("save","Save results (to object named results.badLM in working space)")
-          )
-      ))
-    ),
-    tabPanel("?Simulations",
-             fluidRow(
-               column(width=3,
-                      wellPanel(verticalLayout(
-                        HTML("<p style='white-space: pre-wrap'>Set the number of simulations.</p>
-                             <p style='white-space: pre-wrap'>Pres the Go button to perform the desired number of simulations (may take some time).</p>
-                             <p style='white-space: pre-wrap'>When simulations have been performed the drop-down menu allows to choose the parameter to show on the right.</p>
-                             <p style='white-space: pre-wrap'>Plot of p-values of Breusch-Pagan and Shapiro wilks tests are also shown.</p>
-                             ")
-                      ))
-               ),
-               column(width=9,
-                      verticalLayout(
-                        splitLayout(cellArgs=list(style = "overflow:hidden;"),
-                          verticalLayout(
-                            HTML("<br><p style='white-space: pre-wrap'>For beta1, beta2, prev: Sample distribution of the estimator, the true value, if available, is shown in green, the empirical mean of the estimates is shown as a black triangle.</p>
-                                 <p style='white-space: pre-wrap'>If the option quantile plots is chosen the empirical quantiles are compared to those of the appropriate distribution (gaussian for beta1, beta2 and prev, chi.square for the variance estimator.</p>
-                                <p style='white-space: pre-wrap'>For the variance: sample distribution of the estimator s or empirical quantiles of s versus quantiles of the square root of a chi-square distribution.</p>
-                                 ")
-                          ),
-                          verticalLayout(
-                            HTML("<br><p style='white-space: pre-wrap'>For beta1, beta2, prev: sample distribution of a pivotal quantity associated to the parameter.</p>
-                                 <p style='white-space: pre-wrap'>If the option quantile plots is chosen the empirical quantiles are compared to those of the appropriate distribution (t for beta1, beta2 and prev).</p>
-                                <p style='white-space: pre-wrap'>For the variance: sample distribution of the estimator s^2 or empirical quantiles of s^2 versus quantiles of the chi-square distribution.</p>
-                                 ")
-                          ),
-                          verticalLayout(
-                            HTML("<br><p style='white-space: pre-wrap'>Comparison of mpirical coverage and nominal coverage of confidence intervals for the parameter.</p>
-                                 <p style='white-space: pre-wrap'>For the variance, if a heteroschedastic model is considered, there is no true value of the parameter to assess coverage, hence the true variance function is shown together with its estimated and its standard error.</p>
-                                 ")
-                          )
-                        ),
-                        wellPanel(
-                          HTML("<p style='white-space: pre-wrap'>Table comparing the true value of parameters (when available) and the simulation results.</p>")
-                          )
-                      )
-               )
-             )
-    )))
+                                  ),
+                         column(width=9,
+                                verticalLayout(
+                                  splitLayout(cellArgs=list(style = "overflow:hidden;"),
+                                              verticalLayout(
+                                                HTML("<br><p style='white-space: pre-wrap'>For beta1, beta2, prev: Sample distribution of the estimator, the true value, if available, is shown in green, the empirical mean of the estimates is shown as a black triangle.</p>
+                                                     <p style='white-space: pre-wrap'>If the option quantile plots is chosen the empirical quantiles are compared to those of the appropriate distribution (gaussian for beta1, beta2 and prev, chi.square for the variance estimator.</p>
+                                                     <p style='white-space: pre-wrap'>For the variance: sample distribution of the estimator s or empirical quantiles of s versus quantiles of the square root of a chi-square distribution.</p>
+                                                     ")
+                                                     ),
+                                              verticalLayout(
+                                                HTML("<br><p style='white-space: pre-wrap'>For beta1, beta2, prev: sample distribution of a pivotal quantity associated to the parameter.</p>
+                                                     <p style='white-space: pre-wrap'>If the option quantile plots is chosen the empirical quantiles are compared to those of the appropriate distribution (t for beta1, beta2 and prev).</p>
+                                                     <p style='white-space: pre-wrap'>For the variance: sample distribution of the estimator s^2 or empirical quantiles of s^2 versus quantiles of the chi-square distribution.</p>
+                                                     ")
+                                                ),
+                                              verticalLayout(
+                                                HTML("<br><p style='white-space: pre-wrap'>Comparison of mpirical coverage and nominal coverage of confidence intervals for the parameter.</p>
+                                                     <p style='white-space: pre-wrap'>For the variance, if a heteroschedastic model is considered, there is no true value of the parameter to assess coverage, hence the true variance function is shown together with its estimated and its standard error.</p>
+                                                     ")
+                                                )
+                                                ),
+                                  wellPanel(
+                                    HTML("<p style='white-space: pre-wrap'>Table comparing the true value of parameters (when available) and the simulation results.</p>")
+                                  )
+                                              )
+                                                     )
+                                )
+                                )))
 
 
 
 
 server <- function(input, output, session) {
   updateTabsetPanel(session, inputId="main", selected = "Model specification")
-#  observe({
+  #  observe({
   if (!is.null(dist.custom.param)){
     sceltedistY=c("Gaussian V(Y)=g(x)"="dist.normale","AR1"="dist.normaleAR1",
                   "Poisson"="dist.poisson","Binomial"="dist.binomiale","Gamma"="dist.gamma",
@@ -198,7 +198,7 @@ server <- function(input, output, session) {
     if (!is.null(dist.custom.param$nome)) names(sceltedistY)[length(sceltedistY)]=dist.custom.param$nome
     updateSelectInput(session,"distribuzione",choices=sceltedistY)
   }
-#  })
+  #  })
   dist.normale   =function(n,my,parvet,par=NULL,x) rnorm(n,my,parvet)
   dist.poisson   =function(n,my,parvet,par=NULL,x) rpois(n,my)
   dist.binomiale =function(n,my,parvet,par,x) rbinom(n,prob=my/par[1],size=par[1])
@@ -209,7 +209,7 @@ server <- function(input, output, session) {
       ret=my+rnorm(n,0,sd=par[2])
     }
     return(ret)
-    }
+  }
   dist.gamma     =function(n,my,parvet,par,x) { rgamma(n,par[1],scale=my/par[1]) }
   dist.gammatrasl=function(n,my,parvet,par,x) { my+rgamma(n,par[1],scale=par[2])-par[1]*par[2] }
   dist.uniforme  =function(n,my,parvet,par,x) { my+runif(n,-par[1],+par[1])}
@@ -256,7 +256,7 @@ server <- function(input, output, session) {
   dist.uniforme.param=list(nome="Uniforme",nomepar1="c",minpar1=0.01,maxpar1=15,valuepar1=1,steppar1=0.1,enableVarFunPAnel=FALSE,showVarFun=FALSE)
   dist.student.param=list(nome="t di Student",nomepar1="Gradi di libertà",minpar1=1,maxpar1=30,valuepar1=10,steppar1=0.1,enableVarFunPanel=TRUE,showVarFun=FALSE)
 
- # sivarianza=reactiveVal()
+  # sivarianza=reactiveVal()
 
   #sivarianza(TRUE)
   output$servePannelloVarianza=reactive({
@@ -268,7 +268,7 @@ server <- function(input, output, session) {
   ## renderUI of parameters
   observeEvent(input$distribuzione,{
     req(input$distribuzione)
-     dist.param=get(paste(input$distribuzione,".param",sep=""))
+    dist.param=get(paste(input$distribuzione,".param",sep=""))
 
     if (input$distribuzione %in% c("dist.normale","dist.normaleAR1","dist.uniforme","dist.student","dist.custom")){
       output$beta1inser=renderUI({numericInput("beta1","beta1",min=-5,max=5,value=0,step=0.1)})
@@ -282,7 +282,7 @@ server <- function(input, output, session) {
       output$beta1inser=renderUI({sliderInput("beta1","beta1",min=0,max=input$par,value=input$par/2,step=0.1)})
       output$beta2inser=renderUI({sliderInput("beta2","beta2",min=-input$beta1,max=input$par-input$beta1,value=0,step=0.1)})
     }
-   # if (input$distribuzione=="dist.custom"){
+    # if (input$distribuzione=="dist.custom"){
     if (!is.null(dist.param$minpar1)){
       updateSliderInput(session,"par",label=ifelse(is.null(dist.param$nomepar1),"par1",dist.param$nomepar1),
                         min=dist.param$minpar1,max=dist.param$maxpar1,
@@ -334,8 +334,8 @@ server <- function(input, output, session) {
     }
     if (input$distribuzione=="dist.gammatrasl" & (input$par>0) & (input$par2>0)){
       #xseq=0:qmamma(0.95,input$par,scale=input$par2)
-            curve(dgamma(x,input$par,scale=input$par2),from=0,to=qgamma(0.99,input$par,scale=input$par2),xaxt="n",lwd=2,col="darkblue",
-                  xlab="errre",ylab="densità",yaxt="n")
+      curve(dgamma(x,input$par,scale=input$par2),from=0,to=qgamma(0.99,input$par,scale=input$par2),xaxt="n",lwd=2,col="darkblue",
+            xlab="errre",ylab="densità",yaxt="n")
       axis(1,at=c(0,input$par*input$par2),label=signif(c(-input$par*input$par2,0),2))
     }
     if (input$distribuzione=="dist.poisson" & (input$beta1>0) & (input$beta1+input$beta2>0)){
@@ -390,8 +390,8 @@ server <- function(input, output, session) {
     x=(x-min(x))/(max(x)-min(x))
     x=x*input$taglia
     x=sort(x)
-   return(x)
-    })
+    return(x)
+  })
   ###########################################################################################
   ########
   #######   INPUT DELLA FUNZIONE DI VARIANZA
@@ -400,8 +400,8 @@ server <- function(input, output, session) {
     if (is.null(rv$xcoordvar)){
       rv$xcoordvar=c(0,1)
       rv$ycoordvar=c(1,1)
-    rv$min=0
-    rv$max=2
+      rv$min=0
+      rv$max=2
     }
   })
 
@@ -410,34 +410,34 @@ server <- function(input, output, session) {
     if (is.null(rv$xcoordvar)){
       rv$xcoordvar=c(0,1)
       rv$ycoordvar=c(1,1)}
-  temp=data.frame(x=rv$xcoordvar,y=rv$ycoordvar)
-   if (input$plot_click$x<=0){
-    if (any(temp$x==0)){
-      temp$y[temp$x==0]=input$plot_click$y
-    } else {
-      temp=rbind(temp,c(0,input$plot_click$y))
+    temp=data.frame(x=rv$xcoordvar,y=rv$ycoordvar)
+    if (input$plot_click$x<=0){
+      if (any(temp$x==0)){
+        temp$y[temp$x==0]=input$plot_click$y
+      } else {
+        temp=rbind(temp,c(0,input$plot_click$y))
+      }
     }
-  }
-  if (input$plot_click$x>=1){
-    if (any(temp$x==1)){
-      temp$y[temp$x==1]=input$plot_click$y
-    } else {
-      temp=rbind(temp,c(1,input$plot_click$y))
+    if (input$plot_click$x>=1){
+      if (any(temp$x==1)){
+        temp$y[temp$x==1]=input$plot_click$y
+      } else {
+        temp=rbind(temp,c(1,input$plot_click$y))
+      }
     }
-  }
-  if ((input$plot_click$x<1)&(input$plot_click$x>0)) {
-    if ((input$plot_click$y>rv$min) & (input$plot_click$y<rv$max)){
-      temp=rbind(temp,c(input$plot_click$x,input$plot_click$y))
+    if ((input$plot_click$x<1)&(input$plot_click$x>0)) {
+      if ((input$plot_click$y>rv$min) & (input$plot_click$y<rv$max)){
+        temp=rbind(temp,c(input$plot_click$x,input$plot_click$y))
+      }
+      if ((input$plot_click$y<rv$min)){
+        rv$min=max(0,rv$min-0.1*(rv$max-rv$min))
+      }
+      if ((input$plot_click$y>rv$max)){
+        rv$max=rv$max+0.1*(rv$max-rv$min)
+      }
     }
-    if ((input$plot_click$y<rv$min)){
-      rv$min=max(0,rv$min-0.1*(rv$max-rv$min))
-    }
-    if ((input$plot_click$y>rv$max)){
-      rv$max=rv$max+0.1*(rv$max-rv$min)
-    }
-  }
-      rv$xcoordvar=temp$x
-      rv$ycoordvar=temp$y
+    rv$xcoordvar=temp$x
+    rv$ycoordvar=temp$y
   })
 
 
@@ -531,9 +531,9 @@ server <- function(input, output, session) {
     y1.sim=rep(NA,input$m)
     shap.test.v=rep(NA,input$m)
     bptest.v=rep(NA,input$m)
-#    withProgress(message = 'Making plot', value = 0, {
+    #    withProgress(message = 'Making plot', value = 0, {
     for (i in 1:input$m){
-#    incProgress(1/mm, detail = paste("Doing part", i))
+      #    incProgress(1/mm, detail = paste("Doing part", i))
       disty=get(input$distribuzione)
       funzione.veravar=get(paste(input$distribuzione,".veravar",sep=""))
       if (is.null(funzione.veravar)) funzione.veravar=function(my,parvet,par,x) NA
@@ -593,7 +593,7 @@ server <- function(input, output, session) {
     par(mar=c(5,4,0.5,0.5))
     qqnorm(campioneperplotdiprova()$fit$resid,main="")
     qqline(campioneperplotdiprova()$fit$resid)
-      },height=300)
+  },height=300)
 
 
   plotEstimators=function(whichplot,sampledest,vero,xlab,statT=FALSE){
@@ -610,7 +610,7 @@ server <- function(input, output, session) {
       if (statT) {
         plot(qt(((1:length(simula()$t2.v))-0.5)/length(simula()$t2.v),input$n-2),sort(simula()$t2.v),
              xlab=expression(paste("Theoretical quantiles ",t[n-2])),ylab="Sample quantiles")
-             abline(0,1)
+        abline(0,1)
       } else {
         qqnorm(sampledest,main="")
         qqline(sampledest)
@@ -699,7 +699,7 @@ server <- function(input, output, session) {
       plot(sqrt(qchisq(((1:length(simula()$sigma.v))-0.5)/length(simula()$prev.v),input$n-2)),sort(simula()$sigma.v),
            xlab="Theoretical quantiles (t)",ylab="Sample quantiles",
            main=expression(bold(paste("Quantiles of sample dist. of",s^2))))
-    #  abline(0,1)
+      #  abline(0,1)
     }
   })
   output$sigma2plot=renderPlot({
@@ -716,11 +716,11 @@ server <- function(input, output, session) {
       plot(qchisq(((1:length(simula()$sigma.v^2))-0.5)/length(simula()$prev.v),input$n-2),sort(simula()$sigma.v^2),
            xlab="Theoretical quantiles (t)",ylab="Sample quantiles",
            main=expression(bold(paste("Quantiles ",s^2,"-quantiles ",chi[n-2]^2))))
-    #  abline(0,1)
+      #  abline(0,1)
     }
   })
   output$coperturaintervallisigma2=renderPlot({
-   # plot(1,1,type="n",xaxt="n",yaxt="n",bty="n")
+    # plot(1,1,type="n",xaxt="n",yaxt="n",bty="n")
     if (length(rv$veravar)==1) { if (!is.na(rv$veravar[1])) {
       seqlc=c(seq(0.8,0.99,by=0.01))
       copertura=rep(NA,length(seqlc))
@@ -751,12 +751,12 @@ server <- function(input, output, session) {
         "std dev"=sd(x),
         "q025"=as.numeric(quantile(x,0.025)),
         "q975"=as.numeric(quantile(x,0.975))
-        )
+      )
     }
-    if ((length(rv$veravar)==1) &  (!is.null(rv$veravar))) { veravarianza=rv$veravar } else {veravarianza=NA}
+    if ((length(unique(rv$veravar))==1) &  (!is.null(rv$veravar))) { veravarianza=rv$veravar[1] } else {veravarianza=NA}
     a=data.frame(rbind(riassunti(simula()$beta1.v,input$beta1),riassunti(simula()$beta2.v,input$beta2),
-                     riassunti(simula()$sigma.v,sqrt(veravarianza)),riassunti(simula()$sigma.v^2,veravarianza),
-                     riassunti(simula()$prev.v,input$beta1+input$beta2)))
+                       riassunti(simula()$sigma.v,sqrt(veravarianza)),riassunti(simula()$sigma.v^2,veravarianza),
+                       riassunti(simula()$prev.v,input$beta1+input$beta2)))
     rownames(a)=c("beta1","beta2","sigma","sigma2","y(1)")
     a
   },rownames=TRUE)
@@ -771,7 +771,7 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$save,{
-    cat(getwd())
+    #cat(getwd())
     results=list(simulations=simula(),
                  truevar=rv$veravar,
                  beta1=input$beta1,

@@ -11,9 +11,14 @@
 #' \item{errore}{the errors}
 #' \item{xperdens,ferrore}{coordinates of points of the true density of errors}
 #'
+#' @details
+#' The sample size is simulated between 10 and 1000 according to a uniform distribution.
+#' The explanatory variable is simulated as uniform, Gaussian, chi.square, t or a mixture of normal distributions.
+#' If non linearity or heteroscedasticity is chosen a random regression function or variance function is defined, if non normality is chosen the (always additive) error is simulated from a chi.square, t, Beta or truncated normal.#'
 #'
 #' @author Francesco Pauli, \email{francesco.pauli@@deams.units.it}
 #' @seealso \code{\link{ComputerDecision.default}}, \code{\link{checksim}}
+
 #'
 #' @examples
 #' Simulation.default(1)

@@ -4,9 +4,12 @@
 \alias{QuizResidual}
 \title{QuizResidual shiny app}
 \usage{
-QuizResidual(ComputerDecision = ComputerDecision.default,
-  Simulation = Simulation.default, dir.images = NULL,
-  dir.sounds = NULL)
+QuizResidual(
+  ComputerDecision = ComputerDecision.default,
+  Simulation = Simulation.default,
+  dir.images = NULL,
+  dir.sounds = NULL
+)
 }
 \arguments{
 \item{ComputerDecision}{the function to be used to state the answer of the computer player (see \code{\link{ComputerDecision.default}})}

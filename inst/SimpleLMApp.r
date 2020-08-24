@@ -11,19 +11,19 @@ ui <- fluidPage(
   # Input functions
   sidebarLayout(
     sidebarPanel(
-      sliderInput("n","Number of observations",min=8,max=100,value=25,step=1),
+      sliderInput("n","Number of observations",min=8,max=1000,value=25,step=1),
       hr(),
-      p(strong("Model parameters")),
+      p(strong("Model: \\(y_i=\\beta_1+\\beta_2x_i+\\varepsilon_i\\), \\(\\varepsilon_i\\thicksim IID(\\mathcal N(0,\\sigma^2))\\)")),
       splitLayout(
-        numericInput("beta0","beta_1",0,-10,10,0.1,width="100%"),
-        numericInput("beta1","beta_2",1,-10,10,0.1,width="100%"),
-        numericInput("sdeverr","error st. dev.",1,0,10,0.1,width="100%")
+        numericInput("beta0","\\(\\beta_1\\)",0,-10,10,0.1,width="100%"),
+        numericInput("beta1","\\(\\beta_2\\)",1,-10,10,0.1,width="100%"),
+        numericInput("sdeverr","\\(\\sigma\\)",1,0,10,0.1,width="100%")
       ),
       hr(),
       p(strong("Explanatory variable")),
       splitLayout(
-        numericInput("sdevx","st. dev. of x",0.5,0,1,0.1,width="100%"),
-        numericInput("xbar","mean of x",0,-3,3,0.1,width="100%")
+        numericInput("sdevx","\\(\\sqrt{V(x)}\\)",0.5,0,1,0.1,width="100%"),
+        numericInput("xbar","\\(\\bar{x}\\)",0,-3,3,0.1,width="100%")
       ),
       checkboxInput("mostra","show estimates on plot"),
       hr(),
@@ -52,16 +52,16 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel("Residuals",
                  splitLayout(
-                   plotOutput("residui1", width = "100%", height="300px"),
-                   plotOutput("residui2", width = "100%", height="300px"),
-                   plotOutput("residui3", width = "100%", height="300px")
+                   plotOutput("residui1", width = "100%"),
+                   plotOutput("residui2", width = "100%"),
+                   plotOutput("residui3", width = "100%")
                  )
         ),
         tabPanel("Sample dist. coefs",
                  splitLayout(
-                   plotOutput("beta0plot", width = "100%", height="300px"),
-                   plotOutput("beta1plot", width = "100%", height="300px"),
-                   plotOutput("beta0beta1", width = "100%", height="300px")
+                   plotOutput("beta0plot",  width = "100%"),
+                   plotOutput("beta1plot",  width = "100%"),
+                   plotOutput("beta0beta1", width = "100%")
                  ),
                  textOutput("numsim")
         ),
@@ -74,29 +74,33 @@ ui <- fluidPage(
                      p(textOutput("beta0ictesto")),
                      p(textOutput("beta1ictesto"))
                    ),
-                   plotOutput("beta0ic", width = "100%", height="300px"),
-                   plotOutput("beta1ic", width = "100%", height="300px")
+                   plotOutput("beta0ic", width = "100%"),
+                   plotOutput("beta1ic", width = "100%")
                  )
         ),
         tabPanel("Sample dist var",
                  splitLayout(
-                   plotOutput("sigmaplot", width = "100%", height="300px"),
-                   plotOutput("sigma2plot", width = "100%", height="300px")
+                   plotOutput("sigmaplot", width = "100%"),
+                   plotOutput("sigma2plot", width = "100%")
                  ),
                  textOutput("numsim2")
         ),
         tabPanel("Piv. Q.",
                  splitLayout(
-                   plotOutput("qp1plot", width = "100%", height="300px"),
-                   plotOutput("qp2plot", width = "100%", height="300px")
+                   plotOutput("qp1plot", width = "100%"),
+                   plotOutput("qp2plot", width = "100%")
                  ),
                  textOutput("numsim3")
         ),
         tabPanel("Prediction",
-                 wellPanel(
-                   checkboxInput("previsioni","Show predictions on plot"),
-                   sliderInput("livello","Level",0.5,0.99,0.90,0.01,width="100%"),
-                   sliderInput("extra","extrapolation (%)",0,200,0,1,width="100%")
+                 splitLayout(
+                   wellPanel(
+                     verticalLayout(
+                      checkboxInput("previsioni","Show predictions on plot"),
+                      sliderInput("livello","Level",0.5,0.99,0.90,0.01,width="100%"),
+                      sliderInput("extra","extrapolation (%)",0,200,0,1,width="100%")
+                     )),
+                     plotOutput("previsioniv")
                  )
         )
       )
@@ -169,7 +173,9 @@ server <- function(input, output, session) {
     rv$sigma.v=c()
   })
   observeEvent(input$scarica,{
-    write.table(data.frame(x=x(),y=y()),sep=",",file=paste0(.wd,"/temp.csv"))
+    #dati=data.frame(x=x(),y=y())
+    #.GlobalEnv$results.SimpleLM=dati
+    write.table(dati,sep=",",file=paste0(.wd,"/temp.csv"))
   })
   output$numsim=renderText(
     paste("Sample distributions of estimators based on ",
@@ -219,7 +225,9 @@ server <- function(input, output, session) {
 
   x=eventReactive(input$n*input$sdevx*input$xbar,{
     req(is.numeric(input$xbar) & is.numeric(input$sdevx) & (input$sdevx>0))
-    x=rnorm(input$n,input$xbar,input$sdevx)
+    x=rnorm(input$n,0,1)
+    x=(x-mean(x))/sd(x)
+    x=input$xbar+input$sdevx*x
     return(x)
   })
   Dx=reactive({sum((x()-input$xbar)^2)})
@@ -233,8 +241,6 @@ server <- function(input, output, session) {
 
   output$scatter=renderPlot({
     par(mar=c(4,4,1,1))
-    #    limy=input$beta0+c(-1,1)*3*abs(input$beta1)+c(-1,1)*3*input$sdeverr
-    #    limx=c(min(0,input$xbar-4*input$sdevx),max(0,input$xbar+4*input$sdevx,ifelse(input$mostra,input$xbar+1.1,0)))
     if (input$mostra){
       limx=c(min(c(0,1,x())),max(c(0,1.1,x())))
       limy=range(c(input$beta0+input$beta1*(input$xbar+c(-1,1)*4*input$sdevx)+c(-1,1)*3*input$sdeverr,input$beta0+c(-1,1)*qnorm(0.95)*input$sdeverr*sqrt(1/input$n+mean(x())^2/Dx()),input$beta0+c(-1,1,-1,1)*qnorm(0.95)*input$sdeverr*sqrt(1/input$n+mean(x())^2/Dx())+input$beta1+c(-1,-1,1,1)*qnorm(0.95)*input$sdeverr*sqrt(1/Dx())))
@@ -260,8 +266,12 @@ server <- function(input, output, session) {
          labels=signif(c(limy,input$beta0),3))
     rug(x())
     text(ifelse(input$beta1>0,limx[1],limx[2]),limy[2],adj=c(0+(input$beta1<=0),1),col="darkred",
-         label=substitute(paste(hat(y),"=",b0,"+",b1,"x"),
-                          list(b0=signif(fit()$coef[1],3),b1=signif(fit()$coef[2],3),r2=signif(summfit()$r.squared,3)))
+         label=substitute(paste(hat(y),"=",b0,segno,b1,"x"," (est. reg. line)"),
+                          list(b0=signif(fit()$coef[1],3),b1=signif(fit()$coef[2],3),r2=signif(summfit()$r.squared,3),segno=ifelse(fit()$coef[2]>0,"+","")))
+    )
+    text(ifelse(input$beta1>0,limx[1],limx[2]),limy[2]-0.1*(limy[2]-limy[1]),adj=c(0+(input$beta1<=0),1),col="darkgray",
+         label=substitute(paste(E(y),"=",b0,segno,b1,"x"," (true reg. line)"),
+                          list(b0=signif(input$beta0,3),b1=signif(input$beta1,3),segno=ifelse(input$beta1>0,"+","")))
     )
     #         expression(paste("Retta stimata:",hat(y),"=",signif(fit()$coef[1],3)," + ",signif(fit()$coef[2],3),"x")))
     curve(input$beta0+input$beta1*x,col=gray(0.5),lwd=2,add=TRUE)
@@ -288,76 +298,83 @@ server <- function(input, output, session) {
 
 
   output$beta1plot=renderPlot({
-    if (length(rv$beta1.v>1)){
-      par(mar=c(5,1,1,1))
+    req(length(rv$beta0.v)>0)
+    par(mar=c(5,1,1,1))
       a=hist(rv$beta1.v,n=nintf(rv$beta1.v))
       plot(a,main="",yaxt="n",border="white",col="darkred",xlab=expression(hat(beta)[2]),freq=FALSE,
            ylim=c(0,max(0*a$density,1.2*dnorm(input$beta1,input$beta1,input$sdeverr*sqrt(1/Dx())))))
       points(input$beta1,0,pch=20,col="darkgreen",cex=3)
       points(mean(rv$beta1.v),0,pch=17,col="black",cex=2.2)
       curve(dnorm(x,input$beta1,input$sdeverr*sqrt(1/Dx())),add=TRUE,col=gray(0.7),lwd=2)
-    }
   })
   output$beta0plot=renderPlot({
-    if (length(rv$beta0.v>1)){
-      par(mar=c(5,1,1,1))
+    req(length(rv$beta0.v)>0)
+    par(mar=c(5,1,1,1))
       a=hist(rv$beta0.v,n=nintf(rv$beta0.v))
       plot(a,main="",yaxt="n",border="white",col="darkred",xlab=expression(hat(beta)[1]),freq=FALSE,
            ylim=c(0,max(0*a$density,1.2*dnorm(input$beta0,input$beta0,input$sdeverr*sqrt(1/input$n+mean(x())^2/Dx())))))
       points(input$beta0,0,pch=20,col="darkgreen",cex=3)
       points(mean(rv$beta0.v),0,pch=17,col="black",cex=2.2)
       curve(dnorm(x,input$beta0,input$sdeverr*sqrt(1/input$n+mean(x())^2/Dx())),add=TRUE,col=gray(0.7),lwd=2)
-    }
   })
   output$qp1plot=renderPlot({
-    if (length(rv$beta0.v>1)){
-      par(mar=c(5,1,1,1))
+    req(length(rv$beta0.v)>0)
+    par(mar=c(5,1,1,1))
       qp=(rv$beta0.v-input$beta0)/(rv$sigma.v*sqrt(1/input$n+input$xbar^2/Dx()))
       a= hist(qp,n=nintf(qp))
       plot(a,main="",yaxt="n",border="white",col="darkred",xlab=expression(t[1]),freq=FALSE,
            xlim=range(c(qt(c(0.001,0.999),df=input$n-2),qp)),ylim=c(0,max(1.2*dt(0,df=input$n-2),0*a$density)))
       curve(dt(x,df=input$n-2),add=TRUE,col="darkgreen",lwd=2)
-    }
   })
   output$qp2plot=renderPlot({
-    if (length(rv$beta0.v>1)){
+    req(length(rv$beta0.v)>0)
       par(mar=c(5,1,1,1))
       qp=(rv$beta1.v-input$beta1)/(rv$sigma.v*sqrt(1/Dx()))
       a= hist(qp,n=nintf(qp))
       plot(a,main="",yaxt="n",border="white",col="darkred",xlab=expression(t[2]),freq=FALSE,
            xlim=range(c(qt(c(0.001,0.999),df=input$n-2),qp)),ylim=c(0,max(1.2*dt(0,df=input$n-2),0*a$density)))
       curve(dt(x,df=input$n-2),add=TRUE,col="darkgreen",lwd=2)
-    }
   })
   output$beta0beta1=renderPlot({
-    if (length(rv$beta0.v>1)){
+    req(length(rv$beta0.v)>0)
       par(mar=c(5,5,1,1))
       plot(rv$beta0.v,rv$beta1.v,pch=20,col="darkred",xlab=expression(hat(beta)[1]),ylab=expression(hat(beta)[2]),las=1)
       points(input$beta0,input$beta1,pch=20,col="darkgreen",cex=2)
-    }
   })
+
+  output$previsioniv=renderPlot({
+    par(mar=c(5,4,0.5,0.5))
+    limx=c(min(x()),max(x()))
+    if (input$previsioni){
+      limx=c(min(x())-(input$extra/200)*(max(x())-min(x())),max(x())+(input$extra/200)*(max(x())-min(x())))
+    }
+    matplot(matrix(rep(limx,length(rv$beta0.v)),nrow=2),
+            rbind(rv$beta0.v+rv$beta1.v*limx[1],rv$beta0.v+rv$beta1.v*limx[2]),type="l",lty=1,col="#8C000069",
+            xlab="x",ylab="y")
+    abline(c(input$beta0,input$beta1),col=gray(0.25),lwd=2)
+
+  })
+
   output$sigmaplot=renderPlot({
-    if (length(rv$sigma.v>1)){
-      par(mar=c(5,1,1,1))
+    req(length(rv$beta0.v)>0)
+    par(mar=c(5,1,1,1))
       a=hist(sqrt(rv$sigma.v),n=nintf(rv$sigma.v))
       plot(a,main="",yaxt="n",border="white",col="darkred",xlab=expression(hat(sigma)),freq=FALSE,
            ylim=c(0,max(0*a$density,1.2*dchisq(input$n-2,input$n-2)*2*sqrt(input$sdeverr^2)*(input$n-2)/input$sdeverr^2)))
       points(input$sdeverr,0,pch=20,col="darkgreen",cex=3)
       curve(dchisq(x^2*(input$n-2)/input$sdeverr^2,input$n-2)*2*x*(input$n-2)/input$sdeverr^2,col=gray(0.7),lwd=2,add=TRUE)
-    }
   })
   output$sigma2plot=renderPlot({
-    if (length(rv$sigma.v>1)){
-      par(mar=c(5,1,1,1))
-      a=hist(rv$sigma.v,n=nintf(rv$sigma.v))
-      plot(a,main="",yaxt="n",border="white",col="darkred",xlab=expression(hat(sigma)^2),freq=FALSE,
+    req(length(rv$beta0.v)>0)
+    par(mar=c(5,1,1,1))
+    a=hist(rv$sigma.v,n=nintf(rv$sigma.v))
+    plot(a,main="",yaxt="n",border="white",col="darkred",xlab=expression(hat(sigma)^2),freq=FALSE,
            ylim=c(0,max(0*a$density,1.2*dchisq(input$n-2,input$n-2)*(input$n-2)/input$sdeverr^2)))
-      points(input$sdeverr^2,0,pch=20,col="darkgreen",cex=3)
-      curve(dchisq(x*(input$n-2)/input$sdeverr^2,input$n-2)*(input$n-2)/input$sdeverr^2,col=gray(0.7),lwd=2,add=TRUE)
-    }
+    points(input$sdeverr^2,0,pch=20,col="darkgreen",cex=3)
+    curve(dchisq(x*(input$n-2)/input$sdeverr^2,input$n-2)*(input$n-2)/input$sdeverr^2,col=gray(0.7),lwd=2,add=TRUE)
   })
   output$beta0ic=renderPlot({
-    if (length(rv$beta0.v>1)){
+    req(length(rv$beta0.v)>0)
       par(mar=c(5,1,1,1))
       plot(rv$beta0.v,1:length(rv$beta1.v),
            bty="n",
@@ -378,20 +395,18 @@ server <- function(input, output, session) {
                col=c("black","darkred")[1+
                                           ((rv$beta0.v-qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/input$n+mean(x())^2/Dx()))>input$beta0)+((rv$beta0.v+qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/input$n+mean(x())^2/Dx()))<input$beta0)
                                         ])
-    }
   })
-  output$beta0ictesto=renderText(
-    if (length(rv$beta0.v>1)){
+  output$beta0ictesto=renderText({
+    req(length(rv$beta0.v)>0)
     paste(sum(((rv$beta0.v-qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/input$n+mean(x())^2/Dx()))>input$beta0)+((rv$beta0.v+qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/input$n+mean(x())^2/Dx()))<input$beta0)),
-          "su",
+          "of",
           length(rv$beta1.v),"(",
           round(100*sum(((rv$beta0.v-qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/input$n+mean(x())^2/Dx()))>input$beta0)+((rv$beta0.v+qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/input$n+mean(x())^2/Dx()))<input$beta0))/length(rv$beta1.v),1),"%)")
-    } else {""}
-  )
+  })
 
   output$beta1ic=renderPlot({
-    if (length(rv$beta1.v>1)){
-      par(mar=c(5,1,1,1))
+    req(length(rv$beta0.v)>0)
+    par(mar=c(5,1,1,1))
       plot(rv$beta1.v,1:length(rv$beta1.v),
            bty="n",
            yaxt="n",
@@ -411,15 +426,13 @@ server <- function(input, output, session) {
                col=c("black","darkred")[1+
                                           ((rv$beta1.v-qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/Dx()))>input$beta1)+((rv$beta1.v+qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/Dx()))<input$beta1)
                                         ])
-    }
   })
-  output$beta1ictesto=renderText(
-    if (length(rv$beta0.v>1)){
+  output$beta1ictesto=renderText({
+    req(length(rv$beta0.v)>0)
     paste(sum(((rv$beta1.v-qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/Dx()))>input$beta1)+((rv$beta1.v+qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/Dx()))<input$beta1)),
-          "su",
+          "of",
           length(rv$beta1.v),"(",
-          round(100*sum(((rv$beta1.v-qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/Dx()))>input$beta1)+((rv$beta1.v+qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/Dx()))<input$beta1))/length(rv$beta1.v),1),"%)")
-      } else {""}
+          round(100*sum(((rv$beta1.v-qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/Dx()))>input$beta1)+((rv$beta1.v+qt(1-(1-input$livconf)/2,input$n-2)*sqrt(rv$sigma.v)*sqrt(1/Dx()))<input$beta1))/length(rv$beta1.v),1),"%)")}
   )
 
   output$residui1=renderPlot({

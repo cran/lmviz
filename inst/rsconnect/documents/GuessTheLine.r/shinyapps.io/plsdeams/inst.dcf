@@ -1,0 +1,13 @@
+name: inst
+title: inst
+username:
+account: plsdeams
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1541135
+bundleId: 2667867
+url: https://plsdeams.shinyapps.io/inst/
+when: 1576352244.59636
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: BadLMApp.r|CollinApp.r|ConfintLMApp.r|ConfintLMApp0.r|GuessTheLine1.r|GuessTheLine2.r|GuessTheLine3.r|GuessTheNonLinLine.r|GuessTheNonLinLine2.r|LICENSEMEDIA|LMboardApp.r|MultipleLMApp.r|PredictionLMApp.r|QuizResidualApp.r|SampleDistLMApp.r|SimpleLMApp.r|SlopeTestApp.r|images/immagineP.jpg|images/immagineS.jpg|images/immagineV.jpg

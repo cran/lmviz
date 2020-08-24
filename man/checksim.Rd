@@ -4,8 +4,11 @@
 \alias{checksim}
 \title{Test the computer player performance}
 \usage{
-checksim(m, ComputerDecision = ComputerDecision.default,
-  Simulation = Simulation.default)
+checksim(
+  m,
+  ComputerDecision = ComputerDecision.default,
+  Simulation = Simulation.default
+)
 }
 \arguments{
 \item{m}{number of simulations}

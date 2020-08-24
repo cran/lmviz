@@ -9,15 +9,15 @@ Simulation <- getShinyOption("Simulation",NULL)
 dir.sounds <- getShinyOption("dir.sounds",NULL)
 dir.images <- getShinyOption("dir.images",NULL)
 #
-#source("lmviz/R/ComputerDecision.default.r")
-#source("lmviz/R/Simulation.default.r")
+#source("../R/ComputerDecision.default.r")
+#source("../R/Simulation.default.r")
 #Simulation=Simulation.default
 #ComputerDecision=ComputerDecision.default
 
 #Simulation <- .Simulation
 #ComputerDecision <- .ComputerDecision
-#dir.sounds <- .dir.sounds
-#dir.images <- .dir.images
+#dir.sounds <- "sounds" #.dir.sounds
+#dir.images <- "images" #.dir.images
 
 ui <- fluidPage(id="all",
                 shinyjs::useShinyjs(),
@@ -116,6 +116,12 @@ server <- function(input, output, session) {
   punteggio=reactiveVal(0)
   # maxit=3
   # hide("finaletesto")
+  observeEvent(input$parti,{
+    rv$puntigiocatore=rep(-1,length=input$maxit)
+    rv$punticomputer=rep(-1,length=input$maxit)
+    shinyjs::click("prossimo")
+  })
+
   simula=eventReactive(input$prossimo,{
     iterazione(iterazione()+1)
     rv$giocatore=0
@@ -132,11 +138,6 @@ server <- function(input, output, session) {
 
   output$risultato=renderText("")
 
-  observeEvent(input$parti,{
-    rv$puntigiocatore=rep(-1,length=input$maxit)
-    rv$punticomputer=rep(-1,length=input$maxit)
-    shinyjs::click("prossimo")
-  })
 
   observe({
     if ((iterazione()==input$maxit) & (rv$giocatore!=0)){
@@ -213,7 +214,8 @@ server <- function(input, output, session) {
 
   observeEvent(input$prossimo,{
     req(iterazione()<=input$maxit)
-    rv$computer=ComputerDecision(fit())
+    rv$computer=ComputerDecision(fit())$nonrvcomputer
+    rv$pval=ComputerDecision(fit())$pval
   })
 
 
@@ -303,9 +305,10 @@ server <- function(input, output, session) {
     }
 
   })
-  observe({
-    shinyjs::toggleState(id = "prossimo", condition = (rv$giocatore!=0))
-  })
+
+ observe({
+   shinyjs::toggleState(id = "prossimo", condition = ((iterazione()==0)|(rv$giocatore!=0)))
+ })
 
 
 
@@ -386,14 +389,19 @@ server <- function(input, output, session) {
         lines(simula()$x,simula()$my-simula()$sderr,col="darkgreen",lwd=2,lty=2)
       }
     }
+    if (rv$giocatore!=0){
+      text(min(simula()$x),max(simula()$y),adj=c(0,1),
+           labels=paste("non linearity test p-value",signif(rv$pval[1],4))
+      )
+    }
   })
   output$residui=renderPlot({
     req(iterazione()<=input$maxit)
     par(mar=c(5,4,1,1))
-    hist(resid(fit()),main="",xlab="Istogramma dei residui",freq=FALSE)
+    hist(resid(fit()),main="",xlab="Histogram of residuals",freq=FALSE)
     if ((rv$giocatore!=0) & (rv$vero!=2)  & !is.null(simula()$xperdens) & !is.null(simula()$ferrore)){
       a=hist(resid(fit()),plot=FALSE)
-      plot(a,main="",xlab="Istogramma dei residui",freq=FALSE,
+      plot(a,main="",xlab="Histogram of residuals",freq=FALSE,
            ylim=range(c(a$density,simula()$ferrore,dnorm(a$breaks,mean(simula()$errore),sd(simula()$errore)))))
       lines(simula()$xperdens,simula()$ferrore,col="darkgreen",lwd=2)
       if ((rv$vero==3) & !is.null(simula()$errore)){
@@ -404,17 +412,30 @@ server <- function(input, output, session) {
   output$resplot=renderPlot({
     req(iterazione()<=input$maxit)
     par(mar=c(5,4,1,1))
-    plot(simula()$x,fit()$resid,main="",xlab="x",ylab="Residui",col=c("black",gray(0.7))[1+(rv$giocatore!=0)])
+    plot(simula()$x,fit()$resid,main="",xlab="x",ylab="Residuals",col=c("black",gray(0.7))[1+(rv$giocatore!=0)])
     if ((rv$giocatore!=0) & (rv$vero!=3) & (!is.null(simula()$sderr))){
       polygon(c(simula()$x,rev(simula()$x)),c(simula()$sderr,rev(-simula()$sderr)),col="lightgreen",border="lightgreen")
       points(simula()$x,fit()$resid,col=c("black",gray(0.7))[1+(rv$giocatore!=0)])
       # lines(simula()$x,simula()$sderr,col="darkgreen",lwd=2)
     }
+    if (rv$giocatore!=0){
+      text(min(simula()$x),max(fit()$resid),adj=c(0,1),
+           labels=paste("heteroscedasticity test p-value",signif(rv$pval[2],4))
+      )
+    }
+
   })
   output$resqqplot=renderPlot({
     req(iterazione()<=input$maxit)
     par(mar=c(5,4,1,1))
-    plot(fit(),2,main="")
+    datiperqqnorm=qqnorm(resid(fit()))
+    qqline(resid(fit()))
+    if (rv$giocatore!=0){
+      text(min(datiperqqnorm$x),max(datiperqqnorm$y),adj=c(0,1),
+           labels=paste("non normality test p-value",signif(rv$pval[3],4))
+      )
+    }
+    #plot(fit(),2,main="")
   })
 
 

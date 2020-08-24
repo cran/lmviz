@@ -20,6 +20,11 @@ A list of objects (of which the first two are essential, the following are neede
 \description{
 Simulates an (x,y) sample (suitable for estimating a lm) which can be either non linear/heteroscedastic/non normal or in line with standard lm assumptions
 }
+\details{
+The sample size is simulated between 10 and 1000 according to a uniform distribution.
+The explanatory variable is simulated as uniform, Gaussian, chi.square, t or a mixture of normal distributions.
+If non linearity or heteroscedasticity is chosen a random regression function or variance function is defined, if non normality is chosen the (always additive) error is simulated from a chi.square, t, Beta or truncated normal.#'
+}
 \examples{
 Simulation.default(1)
 

@@ -9,6 +9,9 @@ SimpleLM()
 \description{
 Launches the SimpleLM shiny app, which allows to input the parameters of a linear model and simulate from it, exploring the various diagnostics and sampling distributions
 }
+\details{
+Full help is available from within the shiny app.
+}
 \examples{
 ## Not run:
 if (interactive()){

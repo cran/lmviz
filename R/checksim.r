@@ -26,7 +26,7 @@ checksim=function(m,ComputerDecision=ComputerDecision.default,Simulation=Simulat
     vero[i]=sample(1:4,1)
     c=Simulation(vero[i])
     fit=lm(c$y~c$x)
-    comp[i]=ComputerDecision(fit)
+    comp[i]=ComputerDecision(fit)$nonrvcomputer
   }
   return(table=table(vero,comp))
 }

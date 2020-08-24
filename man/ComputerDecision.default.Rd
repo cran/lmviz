@@ -15,6 +15,11 @@ An integer between 1 and 4 where 1=non linearity; 2=heteroscedasticity; 3=non no
 \description{
 Decides whether a fitted lm objects residuals are such that a violation of the assumptions of non linearity, heteroscedasticity, non normality occurs
 }
+\details{
+The computer answer is determined by a sequence of tests.
+In particular, a test for non linearity is performed (if the sample size is greater than 30 the program tests for the significance of a non linear regression on the residuals versus x, otherwise Ramsey's RESET test is performed), if the null hypothesis is rejected the computer answer will be non linearity, if not, the Breusch-Pagan test for heteroscedasticity is performed, if the null hypothesis is rejected the computer answer will be heteroscedasticity, otherwise the Shapiro-Wilks test of normality is performed and the answer will be non normality if the null hypothesis is rejected; if no test is significant the answer will be `no violation'.
+(Functions to perform the tests are from the package {\code{lmtest}}.)
+}
 \examples{
 x=rnorm(10)
 y=x+rnorm(10,0,0.4)

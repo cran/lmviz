@@ -5,6 +5,11 @@
 #'
 #' @param fit an object returned by \code{\link[stats]{lm}}
 #'
+#' @details
+#' The computer answer is determined by a sequence of tests.
+#' In particular, a test for non linearity is performed (if the sample size is greater than 30 the program tests for the significance of a non linear regression on the residuals versus x, otherwise Ramsey's RESET test is performed), if the null hypothesis is rejected the computer answer will be non linearity, if not, the Breusch-Pagan test for heteroscedasticity is performed, if the null hypothesis is rejected the computer answer will be heteroscedasticity, otherwise the Shapiro-Wilks test of normality is performed and the answer will be non normality if the null hypothesis is rejected; if no test is significant the answer will be `no violation'.
+#' (Functions to perform the tests are from the package {\code{lmtest}}.)
+#'
 #' @return An integer between 1 and 4 where 1=non linearity; 2=heteroscedasticity; 3=non normality; 4=no violation
 #'
 #' @author Francesco Pauli, \email{francesco.pauli@@deams.units.it}
@@ -33,10 +38,13 @@ ComputerDecision.default=function(fit){
   ## input MUST be an lm object
   ## output MUST be an integer between 1 and 4, where
   ## 1=non linearity; 2=heteroscedasticity; 3=non normality; 4=no violation
+  pval=rep(NA,3)
   x=fit$residuals
-  normal.check=(shapiro.test(x)$p.value<0.05)
+  pval[3]=shapiro.test(x)$p.value
+  normal.check=(pval[3]<0.05)
   #  etero.check=bptest(fit)$p.value<0.05
-  etero.check=bptest(fit)$p.value<0.05
+  pval[2]=bptest(fit)$p.value
+  etero.check=pval[2]<0.05
 
   # etero.check=min(c(bptest(fit)$p.value,gqtest(fit)$p.value))<0.05
   # etero.check=(gqtest(fit())$p.value<0.05)
@@ -48,12 +56,15 @@ ComputerDecision.default=function(fit){
     fitg=try(gam(y~s(x),data=data.frame(x=fit$model[,2],y=fit$residuals)))
     if (is(fitg)[1]!="try-error") fits=try(summary(fitg))
     if (is(fits)[1]!="try-error") {
-      lin.check=(fits$s.table[4]<0.05)
+      pval[1]=fits$s.table[4]
+      lin.check=(pval[1]<0.05)
     } else {
-      lin.check=(resettest(fit)$p.value<0.05)
+      pval[1]=resettest(fit)$p.value
+      lin.check=(pval[1]<0.05)
     }
   } else {
-    lin.check=(resettest(fit)$p.value<0.05)
+    pval[1]=resettest(fit)$p.value
+    lin.check=(pval[1]<0.05)
   }
 
   nonrvcomputer=4
@@ -70,5 +81,5 @@ ComputerDecision.default=function(fit){
       }
     }
   }
-  return(nonrvcomputer)
+  return(list(nonrvcomputer=nonrvcomputer,pval=pval))
 }

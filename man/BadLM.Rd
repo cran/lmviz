@@ -4,8 +4,7 @@
 \alias{BadLM}
 \title{BadLM shiny app}
 \usage{
-BadLM(dist.custom = NULL, dist.custom.veravar = NULL,
-  dist.custom.param = NULL)
+BadLM(dist.custom = NULL, dist.custom.veravar = NULL, dist.custom.param = NULL)
 }
 \arguments{
 \item{dist.custom}{custom generator for Y, see examples below}
@@ -22,6 +21,10 @@ Launches the BadLM shiny app, a tool to explore the consequences of the violatio
 }
 \details{
 Allows to set a data generating mechanism for a response variable \eqn{Y} and an explanatory variable \eqn{x} such that \eqn{E(Y|X=x)=\beta_1+\beta_2 x}, various possible distributions for \eqn{Y} are available, depending on the selected distributional assumptions the variance may also be set as a function of \eqn{x}. The program performs a number of simulations from the fit and visualizes the simulated sampling distributions of the estimators.
+
+The user can also decide the distribution of the explanatory variable \eqn{x}: the shape is chosen by the user, then the variable is standardized to have minimum equal to 0 and maximum equal to \eqn{x^*<1}, also chosen by the user (the purpose of this is to explore the out of sample prediction performance of the estimated model). The observations \eqn{x_1,\ldots,x_n} are simulated only once, and kept fixed as appropriate for a regression model which is conditional on the explanatory variable.
+
+Additional data generating mechanisms may be specified by the user and given as an input to the function calling the shiny app (see examples).
 
 Full help is available from within the shiny app.
 }
@@ -48,7 +51,7 @@ varfun=function(my,parvet,par,x){
 #  parvet is g() computed at x values
 #  par is a vector of two parameters
 param=list(nome="Student-t (bis)", #name of dist for drop down menu (optional)
-           nomepar1="Gradi di libertà", #name of parameter 1 (optional)
+           nomepar1="Gradi di libertÃ ", #name of parameter 1 (optional)
            minpar1=1,maxpar1=30, #min/max of param 1 (needed)
            valuepar1=10, #initial value of param1 (optional)
            steppar1=0.1, #increment of param1 (optional)
